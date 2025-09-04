@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Nagari Padang Harapan — Profil Nagari</title>
+<style>
+    :root{
+      /* GANTI ke path foto Anda jika beda lokasi/nama */
+      --bg-image: url('bg.jpeg');
+    }
+    *{ box-sizing: border-box }
+    html, body{ margin:0; padding:0px 0px; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+
+    /* ===== Background foto TANPA overlay/gradien ===== */
+   
+    .hero{
+       margin: 0;
+  min-height: 100vh;
+                           /* tinggi area hero */
+      background: var(--bg-image) center/cover no-repeat;  /* FOTO SAJA */
+      display: flex; align-items: center;
+
+      color: #0b1262;                               /* biar teks tetap terbaca */
+    }
+    .hero-inner{
+      width: 100%; max-width: 1140px;
+      margin: 0 auto; padding: 80px 24px;
+    }
+    h1{ margin:0 0 8px; font-size: clamp(32px, 6vw, 56px); line-height:1.1 }
+    .tagline{ margin:0 12px 16px 0; font-size: clamp(16px, 2.4vw, 22px) }
+    .desc{ margin:0 0 20px; max-width:720px; line-height:1.6 }
+
+    .btn{
+      display:inline-block; padding:12px 18px; margin-right:8px;
+      border-radius:12px; text-decoration:none; font-weight:600;
+      border:1px solid rgba(255,255,255,.6); color:#ffffff; background: transparent;
+    }
+
+    /* contoh konten berikutnya (opsional) */
+    .wrap{ max-width:1140px; margin:32px auto; padding:0 24px }
+    ;
+  </style>
+</head>
+<body>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+  :root{
+    --brand:#2563eb; --brand-2:transparent;
+    --bg-1:#f3f4f6;  --bg-2:#0f172a;
+    --card:#111827;  --glass:rgba(255,255,255,.06);
+    --text:#ffffff;  --muted:#ffffff;
+    --border:rgba(255,255,255,.18);
+  }
+  html,body{color-scheme:dark}
+  body{
+    font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;
+    background:linear-gradient(180deg,var(--bg-1),var(--bg-2)) fixed;
+    color:var(--text)
+  }
+  .navbar{
+    background:rgba(19,19,92,1)!important;
+    backdrop-filter:saturate(180%) blur(14px);
+    z-index:1100;
+  }
+  .navbar .nav-link{color:#fff!important}
+  .navbar .nav-link:hover{color:#bfdbfe!important}
+  /* Tampilkan menu tanpa tombol agar selalu terlihat */
+  .navbar .navbar-collapse{display:flex!important;flex-basis:auto;justify-content:flex-end}
+  .navbar .navbar-nav{flex-direction:row;flex-wrap:wrap;gap:.25rem .5rem}
+  .navbar .nav-link{padding:.5rem .75rem}
+
+  .hero{position:relative;min-height:80vh;display:grid;place-items:center}
+  .hero .glass{background:var(--glass);border:1px solid var(--border);border-radius:16px}
+  .badge-soft{background:rgba(96,165,250,.25);border:1px solid rgba(255,255,255,.25)}
+  .section{padding:80px 0}
+  .card{background:var(--card);border:1px solid var(--border)}
+  .icon-wrap{width:48px;height:48px;border-radius:12px;background:rgba(255,255,255,.12);display:grid;place-items:center}
+  .stat{font-weight:800;font-size:clamp(28px,5vw,44px)}
+  .map-container{height:420px}
+  .gallery img{object-fit:cover;height:220px;border-radius:12px}
+  footer{background:#0b1020}
+  .btn-brand{background:var(--brand);color:#fff;border:0}
+  .btn-brand:hover{filter:brightness(1.05)}
+  .text-muted{color:var(--muted)!important}
+  .leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#0b1020;color:#fff;border:1px solid var(--border)}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR (menu selalu tampak) -->
+<nav class="navbar navbar-dark sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="#">
+      <img src="logopasbar.jpg" alt="Logo" style="height:28px" />
+      <span>Nagari Padang Harapan</span>
+    </a>
+    <div class="navbar-collapse show">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="#profil">Profil</a></li>
+        <li class="nav-item"><a class="nav-link" href="#sejarah">Sejarah</a></li>
+        <li class="nav-item"><a class="nav-link" href="#peta">Peta</a></li>
+        <li class="nav-item"><a class="nav-link" href="#perangkat">Perangkat</a></li>
+        <li class="nav-item"><a class="nav-link" href="#fasilitas">Fasilitas</a></li>
+        <li class="nav-item"><a class="nav-link" href="#potensi">Potensi</a></li>
+        <li class="nav-item"><a class="nav-link" href="#berita">Berita</a></li>
+        <li class="nav-item"><a class="nav-link" href="#galeri">Galeri</a></li>
+        <li class="nav-item"><a class="nav-link" href="#kontak">Kontak</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- MARQUEE -->
+<marquee direction="left" scrollamount="6" style="background:#ffffff;color:#0b1262;padding:10px;font-weight:600">
+  Selamat datang di Website Nagari Padang Harapan — Jam layanan kantor: Senin–Jumat 08.00–16.00 WIB.
+</marquee>
+
+<!-- HERO -->
+<header class="hero container">
+  <div class="row align-items-center w-100 g-4">
+    <div class="col-lg-7">
+      <span class="badge badge-soft text-light mb-3"><i class="bi bi-stars me-1"></i> Profil Resmi</span>
+      <h1 class="display-5 fw-bold mb-2">Nagari Padang Harapan</h1>
+      <p class="lead mb-3" style="color:#ffffff"> <b>Maju, Berdaya, Berbudaya </b></p>
+      <p class="text-muted"<p style="color: white;">Laman resmi Nagari Padang Harapan – informasi nagari, potensi, dan kegiatan masyarakat.</p></p>
+      <div class="d-flex gap-2 mt-3">
+        <a href="#profil" class="btn btn-brand btn-lg"><i class="bi bi-compass me-1"></i> Jelajahi</a>
+        <a href="#kontak" class="btn btn-outline-light btn-lg"><i class="bi bi-telephone me-1"></i> Kontak</a>
+      </div>
+      <div class="d-flex gap-4 mt-4">
+        <div class="text-center">
+          <div class="stat counter" data-target="2670">0</div>
+          <div class="small text-muted">Penduduk</div>
+        </div>
+        <div class="text-center">
+          <div class="stat counter" data-target="2">0</div>
+          <div class="small text-muted">Jorong</div>
+        </div>
+        <div class="text-center">
+          <div class="stat counter" data-target="10">0</div>
+          <div class="small text-muted">UMKM</div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- PROFIL -->
+  <section id="profil" class="section">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <div class="card p-4">
+            <h2 class="h3 mb-2" <p style="color: white;">Profil Nagari</p></h2>
+             <p style="color: white;">Nagari Padang Harapan berada di Provinsi Sumatera Barat. Halaman ini menampilkan informasi dasar nagari, potensi, dan layanan publik. Secara geografis Nagari Sasak Kecamatan Sasak Ranah Pasisie Kabupaten Pasaman Barat terletak antara 00014’15” LU, 00003’30” LS dan 99035’00” BT s/d 99042’20” BT dengan ketinggian 0 – 10 mdpl meter dari permukaan laut dengan Luas Wilayah 32 M2, sedangkan secara administrasi Pemerintahan Nagari Sasak berbatasan langsung dengan Nagari-nagari di Wilayah Kabupaten Pasaman Barat</p>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="vstack gap-3">
+            <div class="card p-4 d-flex flex-row gap-3 align-items-start">
+              <div class="icon-wrap"><p style="color: white;"><i class="bi bi-people"></i></div></p>
+              <div><div class="fw-semibold mb-1"<p style="color: white;">Pelayanan Publik</div><div class="small text-muted"><p style="color: white;">Administrasi kependudukan &amp; surat menyurat berbasis pelayanan prima.</p></div></div>
+            </div>
+            <div class="card p-4 d-flex flex-row gap-3 align-items-start">
+              <div class="icon-wrap"><p style="color: white;"><i class="bi bi-graph-up"></i></div></p>
+              <div><div class="fw-semibold mb-1"<p style="color: white;">Ekonomi Lokal</div><div class="small text-muted"<p style="color: white;">Pertanian, perikanan, dan UMKM sebagai penggerak roda ekonomi nagari.</p></div></div>
+            </div>
+            <div class="card p-4 d-flex flex-row gap-3 align-items-start">
+              <div class="icon-wrap"><p style="color: white;"><i class="bi bi-flower1"></i></div></p>
+              <div><div class="fw-semibold mb-1"<p style="color: white;">Adat &amp; Budaya</div><div class="small text-muted"<p style="color: white;">Gotong royong, musyawarah, dan pelestarian budaya menjadi ruh nagari.</p></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEJARAH -->
+  <section id="sejarah" class="section pt-0">
+    <div class="container">
+      <h2 class="h3 mb-3"<p style="color: black;">Sejarah Nagari Padang Harapan</p></h2>
+      <div class="card p-4">
+        <p class="mb-2"<p style="color: white;">Nagari Padang Harapan bukanlah hal baru di Kecamatan Sasak Ranah Pasisie, karna dahulu Padang Harapan adalah sebuah Desa Padang Harapan yang memang memiliki wilayah administrasi, Masyarakat sebagai sebuah Desa, namun semenjak lahirnya Undang-undang No 22 tahun 1999 tentang Otonomi Daerah membuat Perubahan sistem tata Pemerintahan Desa yang dulu terbagi empat (4) di Wilayah Kecamatan Sasak Ranah Pasisie menjadi satu (1) Nagari yaitu Nagari Sasak pada bulan April tahun 2001.</p>
+        <p class="mb-2"><p style="color: white;">Semenjak itu lah Pemerintahan Desa Padang harapan tidak lagi disebut sebagai sebuah tata pemerintahan yang tersendiri tapi menjadi bagian dari wilayah Pemerintahan Nagari Sasak yang kini disebut Jorong.Namun semenjak lahirnya Undang-undang nomor 6 tahun 2014 tentang Desa yang kembali membuka pintu untuk Penataan Desa dari sinilah beranjak niat dari masyarakat Jorong Sialang dan  Jorong Pisang Hutan kembali untuk memohon Penatan Nagari yang Pemekaran dari Nagari Induk (NagariSasak),Sehingga pada tahun 2017 terbitlah Peraturan Bupati No 33 tentang Nagari Persiapan Padang Harapan sebagai bentuk dukungan dari Pemerintahan Kabupaten Pasaman Barat.</p></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PETA -->
+  <section id="peta" class="section pt-0">
+    <div class="container">
+      <h2 class="h3 mb-3"<p style="color: black;">Peta Nagari</p></h2>
+      <div class="card p-0 overflow-hidden">
+        <div id="map" class="map-container"></div>
+        <div class="p-2 small text-muted">* Opsional: muat batas wilayah dari <code>assets/padangharapan.geojson</code>.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PERANGKAT -->
+  <section id="perangkat" class="section">
+    <div class="container">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h2 class="h3 mb-0"<p style="color: black;">Perangkat Nagari</p></h2>
+        <button class="btn btn-outline-light btn-sm" data-bs-toggle="modal" data-bs-target="#modalPerangkat">
+          <p style="color: black;"><i class="bi bi-diagram-3 me-1"></i> Daftar Lengkap</p>
+        </button>
+      </div>
+      <div class="row g-3">
+        <div class="col-6 col-md-3">
+          <div class="card h-100">
+            <img src="3.jpeg" onerror="this.onerror=null;this.src='placeholder-person.jpg';" class="card-img-top" style="height:220px;object-fit:cover" alt="EFRIZAL,SH" />
+            <div class="card-body">
+              <div class="fw-semibold"<p style="color: white;">EFRIZAL,SH</p></div>
+              <div class="small text-muted"<p style="color: white;">Wali Nagari</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card h-100">
+            <img src="2.jpeg" onerror="this.onerror=null;this.src='placeholder-person.jpg';" class="card-img-top" style="height:220px;object-fit:cover" alt="ANTONI" />
+            <div class="card-body">
+              <div class="fw-semibold"<p style="color: white;">ANTONI</p></div>
+              <div class="small text-muted"<p style="color: white;">Sekretaris Nagari</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card h-100">
+            <img src="enam.jpeg" onerror="this.onerror=null;this.src='placeholder-person.jpg';" class="card-img-top" style="height:220px;object-fit:cover" alt="ARMILA SANTI,S.Pd" />
+            <div class="card-body">
+              <div class="fw-semibold"<p style="color: white;">ARMILA SANTI,S.Pd</p></div>
+              <div class="small text-muted"<p style="color: white;">Kaur Umum</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card h-100">
+            <img src="lima.jpeg" onerror="this.onerror=null;this.src='placeholder-person.jpg';" class="card-img-top" style="height:220px;object-fit:cover" alt="MIRANTI MUSTIKA ANDA" />
+            <div class="card-body">
+              <div class="fw-semibold"<p style="color: white;">MIRANTI MUSTIKA ANDA</p></div>
+              <div class="small text-muted"<p style="color: white;">Kaur Keuangan</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FASILITAS -->
+  <section id="fasilitas" class="section pt-0">
+    <div class="container">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h2 class="h3 mb-0"<p style="color: black;">Fasilitas Umum</p></h2>
+      </div>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="card p-4 h-100">
+            <div class="icon-wrap mb-2"><p style="color: white;"><i class="bi bi-building"></i></div></p>
+            <div class="fw-semibold mb-1"<p style="color: white;">Tempat Ibadah</p></div>
+            <ul class="mb-0 small"><p style="color: white;">
+              <li><p style="color: white;"> 1. Masjid: <b>5</b></li></p>
+              <li><p style="color: white;"> 2. Mushola: <b>10</b></li></p>
+              <li><p style="color: white;"> 3. Gereja: <b>0</b></li></p>
+            </ul>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card p-4 h-100">
+            <div class="icon-wrap mb-2"><p style="color: white;"><i class="bi bi-mortarboard"></i></div></p>
+            <div class="fw-semibold mb-1"><p style="color: white;">Pendidikan</p></div>
+            <ul class="mb-0 small">
+              <li><p style="color: white;">1. TK/PAUD: <b>2</b></li>
+              <li><p style="color: white;">2. SD: <b>2</b></li>
+              <li><p style="color: white;">3. SMP: <b>1</b></li>
+              <li><p style="color: white;">4. SMA: <b>1</b></li>
+              <li><p style="color: white;">5. Perguruan Tinggi: <b>0</b></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card p-4 h-100">
+            <div class="icon-wrap mb-2"><p style="color: white;"><i class="bi bi-heart-pulse"></i></div></p>
+            <div class="fw-semibold mb-1"<p style="color: white;">Kesehatan</p></div>
+            <ul class="mb-0 small">
+              <li><p style="color: white;">1. Puskesmas: <b>0</b></li>
+              <li><p style="color: white;">2. Polindes: <b>2</b></li>
+              <li><p style="color: white;">3. Praktek Bidan: <b>2</b></li>
+              <li><p style="color: white;">4. Posyandu: <b>5</b></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- POTENSI -->
+  <section id="potensi" class="section">
+    <div class="container">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h2 class="h3 mb-0"<p style="color: black;">Potensi Nagari</p></h2>
+      </div>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="card p-4 h-100">
+            <div class="icon-wrap mb-2"<p style="color: white;"><i class="bi bi-pin-map"></i></div>
+            <div class="fw-semibold mb-1"<p style="color: white;">Pertanian &amp; Perkebunan</p></div>
+            <div class="small text-muted"<p style="color: white;">Padi, jagung, kelapa sawit, dan hortikultura.</p></div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card p-4 h-100">
+            <div class="icon-wrap mb-2"<p style="color: white;"><i class="bi bi-pin-map"></i></div></p>
+            <div class="fw-semibold mb-1"<p style="color: white;">Perikanan &amp; Peternakan</p></div>
+            <div class="small text-muted"<p style="color: white;">Budidaya ikan lele & Ayam.</p></div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card p-4 h-100">
+            <div class="icon-wrap mb-2"><p style="color: white;"><i class="bi bi-pin-map"></i></div></p>
+            <div class="fw-semibold mb-1"<p style="color: white;">UMKM</p></div>
+            <div class="small text-muted"<p style="color: white;">Kuliner, kerajinan rumah tangga, dan jasa.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BERITA -->
+  <section id="berita" class="section">
+    <div class="container">
+      <div class="d-flex align-items-end justify-content-between mb-3">
+        <h2 class="h3 mb-0"><p style="color: black;">Berita</p></h2>
+      </div>
+      <div class="row g-3">
+        <div class="col-md-6 col-lg-4">
+          <article class="card h-100">
+            <img src="3.jpg" class="card-img-top" style="height:180px;object-fit:cover" alt="Goro Nagari: Bersih Kampung Menyambut Bulan Bakti" />
+            <div class="card-body">
+              <div class="small text-muted mb-1"><p style="color: white;"><i class="bi bi-calendar-event me-1"></i>03 Juni 2025</div></p>
+              <h3 class="h6 mb-1"<p style="color: white;">Kegiatan sosialisasi di SD senagari Padang harapan</p></h3>
+              <div class="small text-muted"<p style="color: white;">Sosialisasi bahaya narkotika di SD senagari Padang harapan.</div></p>
+            </div>
+          </article>
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <article class="card h-100">
+            <img src="1.jpg" class="card-img-top" style="height:180px;object-fit:cover" alt="Pelatihan Pengolahan Hasil Pertanian untuk UMKM" />
+            <div class="card-body">
+              <div class="small text-muted mb-1"><p style="color: white;"><i class="bi bi-calendar-event me-1"></i>04 Juni 2025</div></p>
+              <h3 class="h6 mb-1"<p style="color: white;">Goro bersama memperingati hari lingkungan hidup sedunia</p></h3>
+              <div class="small text-muted"<p style="color: white;">Perangkat wali nagari bersama-sama melakukan gotong royong membersihkan kantor wali nagari.</div></p>
+            </div>
+          </article>
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <article class="card h-100">
+            <img src="2.jpg" class="card-img-top" style="height:180px;object-fit:cover" alt="Penyerahan Beasiswa Nagari untuk Siswa Berprestasi" />
+            <div class="card-body">
+              <div class="small text-muted mb-1"><p style="color: white;"><i class="bi bi-calendar-event me-1"></i>25 Juni 2025</div></p>
+              <h3 class="h6 mb-1"<p style="color: white;">Didikan subuh TPA jorong sialang</p></h3>
+              <div class="small text-muted"<p style="color: white;">Didikan subuh di jorong sialang nagari Padang harapan.</div></p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALERI -->
+  <section id="galeri" class="section">
+    <div class="container">
+      <h2 class="h3 mb-3"><p style="color: black;">Galeri</h2></p>
+      <div class="row g-3">
+        <div class="col-6 col-md-4">
+          <button class="w-100 p-0 border-0 bg-transparent" onclick="openLightbox('galeri1.jpeg')">
+            <img class="w-100" src="galeri1.jpeg" alt="Galeri 1" />
+          </button>
+        </div>
+        <div class="col-6 col-md-4">
+          <button class="w-100 p-0 border-0 bg-transparent" onclick="openLightbox('galeri2.jpeg')">
+            <img class="w-100" src="galeri2.jpeg" alt="Galeri 2" />
+          </button>
+        </div>
+        <div class="col-6 col-md-4">
+          <button class="w-100 p-0 border-0 bg-transparent" onclick="openLightbox('galeri7.jpeg')">
+            <img class="w-100" src="galeri7.jpeg" alt="Galeri 3" />
+          </button>
+        </div>
+        <div class="col-6 col-md-4">
+          <button class="w-100 p-0 border-0 bg-transparent" onclick="openLightbox('galeri4.jpeg')">
+            <img class="w-100" src="galeri4.jpeg" alt="Galeri 4" />
+          </button>
+        </div>
+        <div class="col-6 col-md-4">
+          <button class="w-100 p-0 border-0 bg-transparent" onclick="openLightbox('galeri5.jpeg')">
+            <img class="w-100" src="galeri5.jpeg" alt="Galeri 5" />
+          </button>
+        </div>
+        <div class="col-6 col-md-4">
+          <button class="w-100 p-0 border-0 bg-transparent" onclick="openLightbox('galeri6.jpeg')">
+            <img class="w-100" src="galeri6.jpeg" alt="Galeri 6" />
+          </button>
+        </div>
+        <div class="col-6 col-md-4">
+          <button class="w-100 p-0 border-0 bg-transparent" onclick="openLightbox('galeri3.jpeg')">
+            <img class="w-100" src="galeri3.jpeg" alt="Galeri 7" />
+          </button>
+        </div>
+        <div class="col-6 col-md-4">
+          <button class="w-100 p-0 border-0 bg-transparent" onclick="openLightbox('galeri8.jpeg')">
+            <img class="w-100" src="galeri8.jpeg" alt="Galeri 8" />
+          </button>
+        </div>
+        <div class="col-6 col-md-4">
+          <button class="w-100 p-0 border-0 bg-transparent" onclick="openLightbox('galeri9.jpeg')">
+            <img class="w-100" src="galeri9.jpeg" alt="Galeri 9" />
+          </button>
+        </div>
+        <div class="col-6 col-md-4">
+          <button class="w-100 p-0 border-0 bg-transparent" onclick="openLightbox('galeri10.jpeg')">
+            <img class="w-100" src="galeri10.jpeg" alt="Galeri 10" />
+          </button>
+        </div>
+        <div class="col-6 col-md-4">
+          <button class="w-100 p-0 border-0 bg-transparent" onclick="openLightbox('galeri11.jpeg')">
+            <img class="w-100" src="galeri11.jpeg" alt="Galeri 11" />
+          </button>
+        </div>
+        <div class="col-6 col-md-4">
+          <button class="w-100 p-0 border-0 bg-transparent" onclick="openLightbox('galeri12.jpeg')">
+            <img class="w-100" src="galeri12.jpeg" alt="Galeri 12" />
+          </button>
+        </div>
+      </div>
+      <dialog id="lightbox" style="border:0;background:transparent">
+        <img id="lightboxImg" src="" alt="Foto" style="max-width:90vw;max-height:80vh;object-fit:contain" />
+      </dialog>
+    </div>
+  </section>
+
+  <!-- KONTAK -->
+  <section id="kontak" class="section">
+    <div class="container">
+      <div class="row justify-content-center g-4">
+        <div class="col-lg-8">
+          <div class="card p-4">
+            <h2 class="h3 mb-3"<p style="color: white;">Kontak &amp; Jam Layanan</h2></p>
+            <ul class="list-unstyled mb-3">
+              <li class="mb-2"><p style="color: white;"><i class="bi bi-geo-alt me-2"></i>Alamat: JL. LINTAS KAPAR, SASAK, JORONG PISANG HUTAN – NAGARI PADANG HARAPAN</li></p>
+              <li class="mb-2"><p style="color: white;"><i class="bi bi-envelope me-2"></i>Email: <a class="link-light" href="mailto:nagaripadangharapan17@gmail.com">nagaripadangharapan17@gmail.com</a></li></p>
+              <li class="mb-2"><p style="color: white;"><i class="bi bi-telephone me-2"></i>Telp/WA: <a class="link-light" href="tel:081378361519">081378361519</a></li></p>
+              <li class="mb-2"><p style="color: white;"><i class="bi bi-clock me-2"></i>Jam Layanan: Senin–Jumat 08.00–16.00 WIB</li></p>
+            </ul>
+            <div class="d-flex gap-2">
+              <a href="mailto:nagaripadangharapan17@gmail.com" class="btn btn-outline-light"><i class="bi bi-envelope"></i> Email</a>
+              <a href="#peta" class="btn btn-brand"><i class="bi bi-geo"></i> Lihat Peta</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- MODAL PERANGKAT -->
+<div class="modal fade" id="modalPerangkat" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content" style="background:#0b1020;color:#fff;border:1px solid rgba(255,255,255,.2)">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-people me-1"></i> Perangkat Nagari (Lengkap)</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-6 col-md-3">
+            <div class="card h-100">
+              <img src="3.jpeg" onerror="this.onerror=null;this.src='placeholder-person.jpg';" class="card-img-top" style="height:220px;object-fit:cover" alt="EFRIZAL,SH" />
+              <div class="card-body">
+                <div class="fw-semibold"<p style="color: white;">EFRIZAL,SH</div></p>
+                <div class="small text-muted">Wali Nagari</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="card h-100">
+              <img src="2.jpeg" onerror="this.onerror=null;this.src='placeholder-person.jpg';" class="card-img-top" style="height:220px;object-fit:cover" alt="ANTONI" />
+              <div class="card-body">
+                <div class="fw-semibold"<p style="color: white;">ANTONI</div></p>
+                <div class="small text-muted">Sekretaris Nagari</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="card h-100">
+              <img src="enam.jpeg" onerror="this.onerror=null;this.src='placeholder-person.jpg';" class="card-img-top" style="height:220px;object-fit:cover" alt="ARMILA SANTI,S.Pd" />
+              <div class="card-body">
+                <div class="fw-semibold"<p style="color: white;">ARMILA SANTI,S.Pd</div></p>
+                <div class="small text-muted">Kaur Umum</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="card h-100">
+              <img src="lima.jpeg" onerror="this.onerror=null;this.src='placeholder-person.jpg';" class="card-img-top" style="height:220px;object-fit:cover" alt="MIRANTI MUSTIKA ANDA" />
+              <div class="card-body">
+                <div class="fw-semibold"<p style="color: white;">MIRANTI MUSTIKA ANDA</div></p>
+                <div class="small text-muted">Kaur Keuangan</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="card h-100">
+              <img src="4.jpeg" onerror="this.onerror=null;this.src='placeholder-person.jpg';" class="card-img-top" style="height:220px;object-fit:cover" alt="MIMI NOVITA SARI,A.Md" />
+              <div class="card-body">
+                <div class="fw-semibold"<p style="color: white;">MIMI NOVITA SARI,A.Md</div></p>
+                <div class="small text-muted">Kasi Kesra &amp; Pelayanan</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="card h-100">
+              <img src="1.jpeg" onerror="this.onerror=null;this.src='placeholder-person.jpg';" class="card-img-top" style="height:220px;object-fit:cover" alt="ELVARDI NOVI ENDRA" />
+              <div class="card-body">
+                <div class="fw-semibold"<p style="color: white;">ELVARDI NOVI ENDRA</div></p>
+                <div class="small text-muted">KA Jorong Sialang</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-brand" data-bs-dismiss="modal">Tutup</button></div>
+    </div>
+  </div>
+</div>
+
+<footer class="py-4 border-top border-secondary-subtle">
+  <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+    <div class="small text-muted"><p style="color: white;">&copy; <span id="year"></span> Portal Web Nagari Padang Harapan.</div></p>
+    <p style="color: white;"><div class="small text-muted">KKN PPM ITS KHATULISTIWA.</p></div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+AOS.init({ once:true, duration:700, easing:'ease-out-quart' });
+
+// Counter anim
+const counters=document.querySelectorAll('.counter');
+const io=new IntersectionObserver((entries,obs)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const el=e.target, target=parseInt(el.dataset.target,10)||0;
+      let cur=0, step=Math.ceil(target/60);
+      const tick=()=>{ cur+=step; if(cur>target) cur=target;
+        el.textContent=cur.toLocaleString('id-ID');
+        if(cur<target) requestAnimationFrame(tick);
+      }; tick(); obs.unobserve(el);
+    }
+  });
+},{threshold:.6});
+counters.forEach(c=>io.observe(c));
+
+// Peta
+const lat=-0.009263, lng=99.739777;
+const map = L.map('map').setView([lat, lng], 12);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
+fetch('assets/padangharapan.geojson')
+  .then(r=>r.ok ? r.json() : null)
+  .then(data=>{
+    if(data){
+      const layer=L.geoJSON(data,{style:{color:'#60a5fa',weight:3,fillColor:'#60a5fa',fillOpacity:.2}}).addTo(map);
+      try{ map.fitBounds(layer.getBounds(),{padding:[20,20]}); }catch(_){/* noop */}
+    }else{
+      L.circleMarker([lat,lng],{radius:8,color:'#60a5fa',fillColor:'#60a5fa',fillOpacity:.9})
+        .addTo(map).bindPopup('Nagari Padang Harapan');
+    }
+  })
+  .catch(()=>{
+    L.circleMarker([lat,lng],{radius:8,color:'#60a5fa',fillColor:'#60a5fa',fillOpacity:.9})
+      .addTo(map).bindPopup('Nagari Padang Harapan');
+  });
+
+// Galeri lightbox
+function openLightbox(src){
+  const d=document.getElementById('lightbox'); const img=document.getElementById('lightboxImg');
+  if(!d||!img) return; img.src=src; d.showModal();
+  const closeHandler=(e)=>{ if(e.target.tagName!=='IMG'){ d.close(); d.removeEventListener('click',closeHandler);} };
+  d.addEventListener('click',closeHandler);
+}
+window.openLightbox=openLightbox;
+
+// Tahun footer
+document.getElementById('year').textContent=new Date().getFullYear();
+</script>
+</body>
+</html>
